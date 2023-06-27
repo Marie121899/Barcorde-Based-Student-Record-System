@@ -1,0 +1,113 @@
+---
+title: "Barcorde Based Student Record System"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(knitr)
+library(DT)
+library(ggplot2)
+library(rpivotTable)
+library(plotly)
+library(dplyr)
+library(highcharter)
+library(openintro)
+library(scales)
+```
+```{r}
+roi<-read.csv("roi.csv")
+nps<-read.csv("nps.csv")
+survey<-read.csv("surveys.csv")
+Si<-read.csv("system_incidents.csv")
+nf<-read.csv("new_features.csv")
+ip<-read.csv("investment_proposals.csv")
+et<-read.csv("employee_training.csv")
+av<-read.csv("Average_response_time.csv")
+```
+```{r}
+mycolors<-c("grey","blue","maroon","#D4AF37")
+```
+
+Row 
+-------------------------------------------------
+
+```{r}
+valueBox("Innovation and Learning Perspective")
+```
+```{r}
+valueBox("Internal Business Processes Perspective")
+```
+
+Row
+-----------------------------------------------
+### New features and functionalities added to the barcode-based student record system
+
+```{r}
+p2 <- et %>%
+         group_by(et$Year.2020) %>%
+         summarise(et$Employee.Training) %>%
+         plot_ly(labels = ~et$Year.2020,
+                 values = ~et$Employee.Training,
+                 marker = list(colors = mycolors)) %>%
+         add_pie(hole = 0.5) %>%
+         layout(xaxis = list(zeroline = F,
+                             showline = F,
+                             showticklabels = F,
+                             showgrid = F),
+                yaxis = list(zeroline = F,
+                             showline = F,
+                             showticklabels=F,
+                            showgrid=F))
+p2 
+```
+### Employees' Trainings 
+```{r}
+p1 <- nf %>%
+         group_by(nf$Year) %>%
+         summarise(sum(nf$New.Features)) %>%
+         plot_ly(x = ~nf$Year,
+                 y = ~nf$New.Features,
+                 type = 'bar',
+                 marker = list(color = 'blue')) %>%
+         layout(xaxis = list(title = "Year"),
+                yaxis = list(title = 'Number of Trainings'))
+p1
+```
+
+### System Uptime incidents
+```{r}
+p3 <- Si %>%
+ group_by(Si$Year.2022) %>%
+         summarise(sum(Si$System.uptime.incidents)) %>%
+         plot_ly(x = ~Si$Year.2022,
+                 y = ~Si$System.uptime.incidents,
+                 type = 'bar',
+                 marker = list(color = '#D4AF37')) %>%
+         layout(xaxis = list(title = "2022"),
+                yaxis = list(title = 'Number of system uptime incidents'))
+p3
+```
+
+### Average Response Time
+```{r}
+time_total=av$number.of.responses*av$time.taken.to.respond..sec.
+average=sum(time_total/sum(av$number.of.responses))
+valueBox(round(average),
+        icon='fa-building',
+         )
+```
+```{r}
+p1 <- nf %>%
+         group_by(nf$Year) %>%
+         summarise(sum(nf$New.Features)) %>%
+         plot_ly(x = ~nf$Year,
+                 y = ~nf$New.Features,
+                 type = 'bar',
+                 marker = list(color = 'blue')) %>%
+         layout(xaxis = list(title = "Year"),
+                yaxis = list(title = 'Number of Trainings'))
+p1

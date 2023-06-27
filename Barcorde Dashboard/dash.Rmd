@@ -1,0 +1,409 @@
+---
+title: "Barcorde Based Student Record System"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    social: [ "twitter", "facebook", "menu"]
+    source_code: embed
+---
+
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(knitr)
+library(DT)
+library(ggplot2)
+library(rpivotTable)
+library(plotly)
+library(dplyr)
+library(highcharter)
+library(openintro)
+library(scales)
+```
+```{r}
+roi<-read.csv("roi.csv")
+nps<-read.csv("nps.csv")
+survey<-read.csv("surveys.csv")
+Si<-read.csv("system_incidents.csv")
+nf<-read.csv("new_features.csv")
+ip<-read.csv("investment_proposals.csv")
+et<-read.csv("employee_training.csv")
+av<-read.csv("Average_response_time.csv")
+```
+```{r}
+mycolors<-c("grey","blue","maroon","#D4AF37")
+```
+
+Internal Business Processes Perspective
+===========================================
+Row
+---------------------------------------
+### Total Number of Trainings
+```{r}
+valueBox(sum(et$Employee.Training),
+         icon = "fa-bicycle")
+```
+
+### Total Number of New features
+```{r}
+valueBox(sum(nf$New.Features),
+         icon = "fa-bicycle")
+```
+
+### Trainings Per New Feature
+```{r}
+Traingings_per_new_feature=sum(et$Employee.Training)/sum(nf$New.Features)
+gauge(round(Traingings_per_new_feature,
+            digits = 2),
+            min = 0,
+            max = 3,
+            gaugeSectors(success = c(2, 3),
+                         warning = c(0.5,1 ),
+                         danger = c(0, 0.5),
+                         colors = c("green", "yellow", "red")))
+```
+
+Row
+---------------------------------------
+
+```{r}
+p2 <- et %>%
+         group_by(et$Year.2020) %>%
+         summarise(et$Employee.Training) %>%
+         plot_ly(labels = ~et$Year.2020,
+                 values = ~et$Employee.Training,
+                 marker = list(colors = mycolors)) %>%
+         add_pie(hole = 0.5) %>%
+         layout(xaxis = list(zeroline = F,
+                             showline = F,
+                             showticklabels = F,
+                             showgrid = F),
+                yaxis = list(zeroline = F,
+                             showline = F,
+                             showticklabels=F,
+                            showgrid=F))
+p2 
+```
+
+### Employees' Trainings 
+
+```{r}
+p1 <- nf %>%
+         group_by(nf$Year) %>%
+         summarise(sum(nf$New.Features)) %>%
+         plot_ly(x = ~nf$Year,
+                 y = ~nf$New.Features,
+                 type = 'bar',
+                 marker = list(color = 'blue')) %>%
+         layout(xaxis = list(title = "Year"),
+                yaxis = list(title = 'Number of Trainings'))
+p1
+```
+
+### 
+```{r}
+p1 <- et %>%
+         group_by(et$Year.2020) %>%
+         summarise(sum(et$Employee.Training)) %>%
+         plot_ly(x = ~et$Employee.Training,
+                 y = ~et$Year.2020,
+                 type = 'bar',
+                 marker = list(color = 'blue')) %>%
+         layout(xaxis = list(title = "Year"),
+                yaxis = list(title = 'Number of Trainings'))
+p1
+```
+
+Innovation and Learning Perspective
+===========================================
+Row 
+--------------------------------------
+### Total time taken
+```{r}
+valueBox(sum(av$Time.taken.to.respond..sec.),
+         icon = "fa-bicycle")
+```
+
+### Average Response Time 
+
+```{r}
+gauge(round(5.5,
+            digits = 2),
+            min = 0,
+            max = 10,
+            gaugeSectors(success = c(7, 10),
+                         warning = c(5.,8 ),
+                         danger = c(0, 4),
+                         colors = c("green", "yellow", "red")))
+```
+
+### Mode of the Response Time
+
+```{r}
+gauge(round(12,
+            digits = 2),
+            min = 0,
+            max = 10,
+            gaugeSectors(success = c(12, 15),
+                         warning = c(8,11 ),
+                         danger = c(0, 7),
+                         colors = c("green", "yellow", "red")))
+```
+
+###Total Time taken
+
+```{r}
+
+```
+
+
+Row 
+--------------------------------------
+### System Incidents 
+```{r}
+p3 <- Si %>%
+ group_by(Si$Year.2022) %>%
+         summarise(sum(Si$System.uptime.incidents)) %>%
+         plot_ly(x = ~Si$Year.2022,
+                 y = ~Si$System.uptime.incidents,
+                 type = 'bar',
+                 marker = list(color = '#D4AF37')) %>%
+         layout(xaxis = list(title = "2022"),
+                yaxis = list(title = 'Number of system uptime incidents'))
+p3
+```
+
+
+Customer's Perspective
+===========================================
+Row
+------------------------------------------------------
+### Average NPS 
+```{r}
+gauge(round(mean(nps$Net.Promoter),
+            digits = 2),
+            min = -100,
+            max = 100,
+            gaugeSectors(success = c(50, 100),
+                         warning = c(0,50 ),
+                         danger = c(-100, 0),
+                         colors = c("green", "yellow", "red")))
+```
+
+### 2019 NPS 
+```{r}
+gauge(round(85,
+            digits = 2),
+            min = -100,
+            max = 100,
+            gaugeSectors(success = c(60, 100),
+                         warning = c(0,60 ),
+                         danger = c(-100, 0),
+                         colors = c("green", "yellow", "red")))
+```
+
+### 2020 NPS 
+```{r}
+gauge(round(60,
+            digits = 2),
+            min = -100,
+            max = 100,
+            gaugeSectors(success = c(70, 100),
+                         warning = c(0,70 ),
+                         danger = c(-100, 0),
+                         colors = c("green", "yellow", "red")))
+```
+### 2021 NPS 
+```{r}
+gauge(round(75,
+            digits = 2),
+            min = -100,
+            max = 100,
+            gaugeSectors(success = c(60, 100),
+                         warning = c(0,60 ),
+                         danger = c(-100, 0),
+                         colors = c("green", "yellow", "red")))
+```
+### 2022 NPS 
+```{r}
+gauge(round(89,
+            digits = 2),
+            min = -100,
+            max = 100,
+            gaugeSectors(success = c(60, 100),
+                         warning = c(0,60 ),
+                         danger = c(-100, 0),
+                         colors = c("green", "yellow", "red")))
+```
+Row
+--------------------------------------------------
+### NPS by Year
+```{r}
+p3 <- nps %>%
+ group_by(nps$Year) %>%
+         summarise(sum(nps$Net.Promoter)) %>%
+         plot_ly(x = ~nps$Year,
+                 y = ~nps$Net.Promoter,
+                 type = 'bar',
+                 marker = list(color = '#D4AF37')) %>%
+         layout(xaxis = list(title = "2022"),
+                yaxis = list(title = 'Net promoter Score'))
+p3
+```
+### Number of Surveys 
+```{r}
+p3 <- survey %>%
+ group_by(survey$Year) %>%
+         summarise(sum(survey$Student.Surveys)) %>%
+         plot_ly(x = ~survey$Year,
+                 y = ~survey$Student.Surveys,
+                 type = 'bar',
+                 marker = list(color = 'blue')) %>%
+         layout(xaxis = list(title = "2022"),
+                yaxis = list(title = 'Number of Survey '))
+p3
+```
+
+Financial Perspective
+===========================================
+Row
+----------------------------------------------
+### Total Investment Aount
+```{r}
+MillionForm <- dollar_format(prefix = "$",suffix="M")
+valueBox(MillionForm((sum(ip$Investment.Amount..million.))),
+        icon = "fa-money",
+        color='white')
+```
+### Total Approved Investment Amount
+```{r}
+MillionForm <- dollar_format(prefix = "$",suffix="M")
+valueBox(MillionForm(25),
+        icon = "fa-money",
+        color='white')
+```
+### Average Expected  Roi
+```{r}
+gauge((scales::percent(mean(ip$Expected.ROI....)/100)),
+            min = 0,
+            max = 50,
+            gaugeSectors(success = c(25, 50),
+                         warning = c(24, 15),
+                         danger = c(0, 14),
+                         colors = c("green", "darkorange", "red")))
+```
+Row
+-----------------------------------------------
+### Total Invesment Amount by Proposal Type
+```{r}
+p4 <- ip %>%
+  filter(!is.na(ip$Proposal.Name)) %>%
+  group_by(ip$Proposal.Name) %>%
+  plot_ly(labels = ~ip$Proposal.Name,
+          values = ~ip$Investment.Amount..million.,
+          marker = list(colors = mycolors)) %>%
+  add_pie(hole = 0.5) %>%
+  layout(xaxis = list(zeroline = F,
+                      showline = F,
+                      showticklabels = F,
+                      showgrid = F),
+         yaxis = list(zeroline = F,
+                      showline = F,
+                      showticklabels = F,
+                      showgrid = F))
+p4
+
+```
+
+### Total Invesment Amount by Year
+```{r}
+p3 <- ip %>%
+ group_by(ip$Year) %>%
+         summarise(sum(ip$Investment.Amount..million.)) %>%
+         plot_ly(x = ~ip$Year,
+                 y = ~ip$Investment.Amount..million.,
+                 type = 'bar',
+                 marker = list(color = 'blue')) %>%
+         layout(xaxis = list(title = "Year"),
+                yaxis = list(title = 'Investment Amount '))
+p3
+```
+### Investment Amount by Status
+```{r}
+p4 <- ip %>%
+  filter(!is.na(ip$Proposed.Status)) %>%
+  group_by(ip$Proposed.Status) %>%
+  plot_ly(labels = ~ip$Proposed.Status,
+          values = ~ip$Investment.Amount..million.,
+          marker = list(colors = mycolors)) %>%
+  add_pie(hole = 0.5) %>%
+  layout(xaxis = list(zeroline = F,
+                      showline = F,
+                      showticklabels = F,
+                      showgrid = F),
+         yaxis = list(zeroline = F,
+                      showline = F,
+                      showticklabels = F,
+                      showgrid = F))
+p4
+
+```
+Row
+-----------------------------------------------
+### Expected ROI by Proposal Type
+```{r}
+p4 <- ip %>%
+  filter(!is.na(ip$Proposal.Name)) %>%
+  group_by(ip$Proposal.Name) %>%
+  plot_ly(labels = ~ip$Proposal.Name,
+          values = ~ip$Expected.ROI....,
+          marker = list(colors = mycolors)) %>%
+  add_pie(hole = 0.5) %>%
+  layout(xaxis = list(zeroline = F,
+                      showline = F,
+                      showticklabels = F,
+                      showgrid = F),
+         yaxis = list(zeroline = F,
+                      showline = F,
+                      showticklabels = F,
+                      showgrid = F))
+p4
+
+```
+
+### Expected ROI by Year
+```{r}
+p3 <- ip %>%
+ group_by(ip$Year) %>%
+         summarise(sum(ip$Expected.ROI....)) %>%
+         plot_ly(x = ~ip$Year,
+                 y = ~ip$Expected.ROI....,
+                 type = 'bar',
+                 marker = list(color = 'blue')) %>%
+         layout(xaxis = list(title = "Year"),
+                yaxis = list(title = 'Expected ROI in % '))
+p3
+```
+### Expected ROI by Status
+```{r}
+p4 <- ip %>%
+  filter(!is.na(ip$Proposed.Status)) %>%
+  group_by(ip$Proposed.Status) %>%
+  plot_ly(labels = ~ip$Proposed.Status,
+          values = ~ip$Expected.ROI....,
+          marker = list(colors = mycolors)) %>%
+  add_pie(hole = 0.5) %>%
+  layout(xaxis = list(zeroline = F,
+                      showline = F,
+                      showticklabels = F,
+                      showgrid = F),
+         yaxis = list(zeroline = F,
+                      showline = F,
+                      showticklabels = F,
+                      showgrid = F))
+p4
+
+```
+
+# International business occurs in many different formats: The movement of goods from country to another (exporting, importing, trade) Contractual agreements that allow foreign firms to use products, services, and processes from other nations (licensing, franchising)
